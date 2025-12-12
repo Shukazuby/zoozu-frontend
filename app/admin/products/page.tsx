@@ -24,9 +24,23 @@ export default function AdminProductsPage() {
       setLoading(true);
       const response = await productsApi.getProducts({ page, limit });
       if (response.success && response.data) {
-        const data = Array.isArray(response.data) ? response.data : response.data.data || [];
-        setProducts(data);
-        setTotal(response.totalCount || data.length);
+        // Handle nested response structure: { data: { totalCount, data: Product[] } }
+        let productsArray: Product[] = [];
+        let totalCount = 0;
+
+        if (Array.isArray(response.data)) {
+          // If data is directly an array
+          productsArray = response.data;
+          totalCount = response.totalCount || productsArray.length;
+        } else if (response.data && typeof response.data === 'object' && 'data' in response.data) {
+          // If data is nested: { totalCount, data: Product[] }
+          const nestedData = response.data as { totalCount?: number; data?: Product[] };
+          productsArray = Array.isArray(nestedData.data) ? nestedData.data : [];
+          totalCount = nestedData.totalCount || response.totalCount || productsArray.length;
+        }
+
+        setProducts(productsArray);
+        setTotal(totalCount);
       }
     } catch (err: any) {
       setError(err.response?.data?.message || "Failed to load products");
