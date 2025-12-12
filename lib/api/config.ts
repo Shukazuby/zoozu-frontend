@@ -38,11 +38,19 @@ apiClient.interceptors.response.use(
     return response;
   },
   (error) => {
-    if (error.response?.status === 401) {
-      // Unauthorized - clear token and redirect to login
+    if (error.response?.status === 401 || error.response?.status === 403) {
+      // Unauthorized or Forbidden - clear token and redirect to appropriate login
       if (typeof window !== 'undefined') {
+        const currentPath = window.location.pathname;
         localStorage.removeItem('auth_token');
-        window.location.href = '/auth/login';
+        
+        // If on admin routes, redirect to admin login
+        if (currentPath.startsWith('/admin')) {
+          window.location.href = '/admin/login';
+        } else {
+          // Otherwise redirect to regular login
+          window.location.href = '/auth/login';
+        }
       }
     }
     return Promise.reject(error);

@@ -43,5 +43,11 @@ export const productsApi = {
     const response = await apiClient.get('/product/search', { params: filters });
     return response.data;
   },
+
+  // Update product (admin)
+  updateProduct: async (id: string, data: Partial<Product>): Promise<BaseResponse<Product>> => {
+    const response = await apiClient.patch(`/product/${id}`, data);
+    return response.data;
+  },
 };
 

@@ -45,5 +45,35 @@ export const tokenManager = {
   isAuthenticated: (): boolean => {
     return tokenManager.getToken() !== null;
   },
+
+  /**
+   * Check if token is expired (quick check without decoding)
+   * For detailed expiration check, use isTokenExpired from adminAuth utils
+   */
+  isTokenExpired: (): boolean => {
+    const token = tokenManager.getToken();
+    if (!token) return true;
+    
+    try {
+      const base64Url = token.split(".")[1];
+      if (!base64Url) return true;
+      const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+      const jsonPayload = decodeURIComponent(
+        atob(base64)
+          .split("")
+          .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
+          .join("")
+      );
+      const decoded = JSON.parse(jsonPayload);
+      if (!decoded || !decoded.exp) return true;
+      
+      // Check if token expires in less than 1 minute (buffer time)
+      const expirationTime = decoded.exp * 1000;
+      const currentTime = Date.now();
+      return currentTime >= expirationTime - 60000;
+    } catch (error) {
+      return true;
+    }
+  },
 };
 
