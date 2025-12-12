@@ -29,7 +29,7 @@ const IconButton = ({ label, children }: IconButtonProps) => (
 const Logo = () => (
   <Link href="/" className="flex items-center gap-2 font-semibold text-slate-900">
     <Image
-      src="/logo.png"
+      src="https://res.cloudinary.com/dkqtwvhq2/image/upload/v1765556450/zoozu_logo_lm422a.jpg"
       alt="ZOOZU_NG Logo"
       width={32}
       height={32}
@@ -43,6 +43,7 @@ const Logo = () => (
 export default function Navbar() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const router = useRouter();
 
   const handleProfileClick = () => {
@@ -55,17 +56,28 @@ export default function Navbar() {
     setIsMobileMenuOpen(false);
   };
 
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      router.push(`/collections?search=${encodeURIComponent(searchQuery.trim())}`);
+      setIsSearchOpen(false);
+      setSearchQuery("");
+    }
+  };
+
   return (
     <header className="sticky top-0 z-40 bg-white/90 shadow-sm shadow-slate-100 backdrop-blur">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 md:px-6 lg:px-8">
         {!isSearchOpen && <Logo />}
 
         {isSearchOpen ? (
-          <div className="flex-1 flex items-center gap-3 max-w-md mx-auto">
+          <form onSubmit={handleSearchSubmit} className="flex-1 flex items-center gap-3 max-w-md mx-auto">
             <div className="relative flex-1">
               <input
                 type="text"
                 placeholder="Search products..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
                 autoFocus
                 className="w-full rounded-full border border-slate-300 bg-white px-4 py-2 pl-10 text-sm text-slate-900 outline-none focus:border-yellow-500 focus:ring-2 focus:ring-yellow-500/20"
               />
@@ -86,12 +98,23 @@ export default function Navbar() {
               </svg>
             </div>
             <button
-              onClick={() => setIsSearchOpen(false)}
+              type="submit"
+              disabled={!searchQuery.trim()}
+              className="rounded-full border border-slate-300 bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Search
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setIsSearchOpen(false);
+                setSearchQuery("");
+              }}
               className="rounded-full border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-800 transition hover:border-yellow-500"
             >
               Cancel
             </button>
-          </div>
+          </form>
         ) : (
           <>
             {/* Desktop Navigation */}
@@ -239,7 +262,7 @@ export default function Navbar() {
               }}
               className="block w-full rounded-lg px-4 py-3 text-left text-sm font-medium text-slate-800 transition hover:bg-yellow-50 hover:text-yellow-700"
             >
-              Search
+              Search Products
             </button>
             <button
               onClick={handleProfileClick}

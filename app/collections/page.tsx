@@ -2,9 +2,10 @@
 import Image from "next/image";
 import Link from "next/link";
 import FilterDropdown from "../components/FilterDropdown";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useProducts } from "@/lib/hooks";
 import { type Product } from "@/lib/api";
+import { useSearchParams } from "next/navigation";
 
 const formatCurrency = (value: number) => `₦${value.toLocaleString()}`;
 
@@ -13,8 +14,11 @@ const priceOptions = ["All Prices", "Under ₦30,000", "₦30,000 - ₦60,000", 
 const availabilityOptions = ["All", "In Stock", "Pre-Order"];
 const sortOptions = ["New Arrivals", "Price: Low to High", "Price: High to Low", "Most Popular", "Name: A-Z"];
 
-export default function CollectionsPage() {
+function CollectionsContent() {
   const { products, loading, error, getProducts } = useProducts();
+  const searchParams = useSearchParams();
+  const searchQuery = searchParams?.get("search") || "";
+  
   const [selectedCategoryButton, setSelectedCategoryButton] = useState<string>("All Collections");
   const [selectedCategory, setSelectedCategory] = useState<string | undefined>();
   const [selectedPrice, setSelectedPrice] = useState<string | undefined>();
@@ -26,6 +30,11 @@ export default function CollectionsPage() {
       page: 1,
       limit: 50,
     };
+
+    // Apply search query if present
+    if (searchQuery) {
+      filters.search = searchQuery;
+    }
 
     // Apply category button filter (Men, Women, Ready-to-Wear, etc.)
     if (selectedCategoryButton === "Men") {
@@ -89,34 +98,47 @@ export default function CollectionsPage() {
     }
 
     getProducts(filters);
-  }, [selectedCategoryButton, selectedCategory, selectedPrice, selectedAvailability, selectedSort, getProducts]);
+  }, [selectedCategoryButton, selectedCategory, selectedPrice, selectedAvailability, selectedSort, searchQuery, getProducts]);
 
   return (
     <div className="bg-white pb-16 pt-12">
       <div className="container space-y-10">
         <div className="text-center space-y-3">
-          <p className="text-xs font-semibold uppercase tracking-[0.25em] text-yellow-700">Spring / Summer 2024</p>
-          <h1 className="text-4xl font-semibold text-slate-900">The Lagos Essence Collection</h1>
-          <p className="text-base text-slate-600 max-w-2xl mx-auto">
-            Exploring the vibrancy of Nigerian heritage through modern cuts and premium fabrics.
-          </p>
+          {searchQuery ? (
+            <>
+              <h1 className="text-4xl font-semibold text-slate-900">Search Results</h1>
+              <p className="text-base text-slate-600 max-w-2xl mx-auto">
+                Showing results for: <span className="font-semibold text-slate-900">"{searchQuery}"</span>
+              </p>
+            </>
+          ) : (
+            <>
+              <p className="text-xs font-semibold uppercase tracking-[0.25em] text-yellow-700">Spring / Summer 2024</p>
+              <h1 className="text-4xl font-semibold text-slate-900">The Lagos Essence Collection</h1>
+              <p className="text-base text-slate-600 max-w-2xl mx-auto">
+                Exploring the vibrancy of Nigerian heritage through modern cuts and premium fabrics.
+              </p>
+            </>
+          )}
         </div>
 
-        <div className="flex flex-wrap items-center justify-center gap-3 text-sm font-semibold text-slate-700">
-          {["All Collections", "Men", "Women"].map((item) => (
-            <button
-              key={item}
-              onClick={() => setSelectedCategoryButton(item)}
-              className={`rounded-full border px-4 py-2 transition ${
-                selectedCategoryButton === item
-                  ? "border-yellow-600 text-yellow-700 bg-yellow-50"
-                  : "border-transparent text-slate-600 hover:border-slate-200"
-              }`}
-            >
-              {item}
-            </button>
-          ))}
-        </div>
+        {!searchQuery && (
+          <div className="flex flex-wrap items-center justify-center gap-3 text-sm font-semibold text-slate-700">
+            {["All Collections", "Men", "Women"].map((item) => (
+              <button
+                key={item}
+                onClick={() => setSelectedCategoryButton(item)}
+                className={`rounded-full border px-4 py-2 transition ${
+                  selectedCategoryButton === item
+                    ? "border-yellow-600 text-yellow-700 bg-yellow-50"
+                    : "border-transparent text-slate-600 hover:border-slate-200"
+                }`}
+              >
+                {item}
+              </button>
+            ))}
+          </div>
+        )}
 
         <div className="flex flex-wrap items-center justify-between gap-3 text-sm text-slate-600">
           <div className="flex gap-2">
@@ -140,7 +162,17 @@ export default function CollectionsPage() {
           </div>
         ) : products.length === 0 ? (
           <div className="text-center py-12">
-            <p className="text-slate-600">No products found.</p>
+            <p className="text-slate-600">
+              {searchQuery ? `No products found for "${searchQuery}".` : "No products found."}
+            </p>
+            {searchQuery && (
+              <Link
+                href="/collections"
+                className="mt-4 inline-block rounded bg-yellow-600 px-6 py-2 text-sm font-semibold text-slate-900 transition hover:bg-yellow-500"
+              >
+                View All Collections
+              </Link>
+            )}
           </div>
         ) : (
           <>
@@ -191,6 +223,23 @@ export default function CollectionsPage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function CollectionsPage() {
+  return (
+    <Suspense fallback={
+      <div className="bg-white pb-16 pt-12">
+        <div className="container">
+          <div className="text-center py-12">
+            <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-yellow-600 border-t-transparent"></div>
+            <p className="mt-4 text-sm text-slate-600">Loading...</p>
+          </div>
+        </div>
+      </div>
+    }>
+      <CollectionsContent />
+    </Suspense>
   );
 }
 
