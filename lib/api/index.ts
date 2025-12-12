@@ -12,6 +12,7 @@ export * from './users';
 export * from './addresses';
 export * from './bespoke-fittings';
 export * from './contact';
+export * from './newsletter';
 
 // Re-export for convenience
 export { cartApi } from './cart';
@@ -25,4 +26,5 @@ export { usersApi } from './users';
 export { addressesApi } from './addresses';
 export { bespokeFittingsApi } from './bespoke-fittings';
 export { contactApi } from './contact';
+export { newsletterApi } from './newsletter';
 
