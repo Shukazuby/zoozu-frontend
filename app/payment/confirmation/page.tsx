@@ -79,7 +79,7 @@ function PaymentConfirmationContent() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
               </div>
-              <h1 className="mb-2 text-3xl font-semibold text-slate-900">Payment Successful</h1>
+              <h1 className="mb-2 text-3xl font-semibold text-slate-900">Payment Successful...</h1>
               <p className="text-lg font-medium text-slate-700 mb-4">
                 Thank you for your purchase. Your payment has been confirmed.
               </p>
@@ -288,7 +288,7 @@ function PaymentConfirmationContent() {
               </Link>
             )}
             <Link
-              href="/profile/orders"
+              href="/profile/orders" 
               className="rounded border border-slate-300 bg-white px-6 py-3 text-center text-sm font-semibold text-slate-800 transition hover:border-yellow-500 hover:bg-yellow-50"
             >
               View All Orders
