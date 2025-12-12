@@ -97,23 +97,23 @@ export default function AdminDashboardPage() {
   ];
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-4 sm:space-y-6 lg:space-y-8">
       <div>
-        <h1 className="text-3xl font-semibold text-slate-900">Dashboard Overview</h1>
-        <p className="text-slate-600 mt-1">Welcome back! Here's what's happening with your store.</p>
+        <h1 className="text-2xl sm:text-3xl font-semibold text-slate-900">Dashboard Overview</h1>
+        <p className="text-sm sm:text-base text-slate-600 mt-1">Welcome back! Here's what's happening with your store.</p>
       </div>
 
       {/* Stats Grid */}
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
         {statCards.map((stat, idx) => (
           <div
             key={idx}
             className="rounded-lg bg-white p-6 shadow-sm border border-slate-200"
           >
             <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-slate-600">{stat.label}</p>
-                <p className="text-2xl font-semibold text-slate-900 mt-1">{stat.value}</p>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs sm:text-sm text-slate-600">{stat.label}</p>
+                <p className="text-xl sm:text-2xl font-semibold text-slate-900 mt-1">{stat.value}</p>
                 {stat.growth !== undefined && (
                   <p
                     className={`text-xs mt-1 ${
@@ -124,7 +124,7 @@ export default function AdminDashboardPage() {
                   </p>
                 )}
               </div>
-              <div className={`text-4xl ${stat.color} p-3 rounded-lg`}>{stat.icon}</div>
+              <div className={`text-3xl sm:text-4xl ${stat.color} p-2 sm:p-3 rounded-lg flex-shrink-0`}>{stat.icon}</div>
             </div>
           </div>
         ))}
@@ -143,23 +143,23 @@ export default function AdminDashboardPage() {
             </Link>
           </div>
         </div>
-        <div className="overflow-x-auto">
-          <table className="w-full">
+        <div className="overflow-x-auto -mx-4 sm:mx-0">
+          <table className="w-full min-w-[640px]">
             <thead className="bg-slate-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase">
+                <th className="px-3 sm:px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase">
                   Order #
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase">
+                <th className="px-3 sm:px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase">
                   Customer
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase">
+                <th className="px-3 sm:px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase">
                   Amount
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase">
+                <th className="px-3 sm:px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase">
                   Status
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase">
+                <th className="px-3 sm:px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase">
                   Payment
                 </th>
               </tr>
@@ -168,16 +168,16 @@ export default function AdminDashboardPage() {
               {recentOrders && recentOrders.length > 0 ? (
                 recentOrders.map((order: any) => (
                   <tr key={order._id} className="hover:bg-slate-50">
-                    <td className="px-6 py-4 text-sm font-medium text-slate-900">
+                    <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm font-medium text-slate-900">
                       {order.orderNumber}
                     </td>
-                    <td className="px-6 py-4 text-sm text-slate-700">
+                    <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-slate-700">
                       {order.user?.fullName || "Guest"}
                     </td>
-                    <td className="px-6 py-4 text-sm font-semibold text-slate-900">
+                    <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm font-semibold text-slate-900">
                       {formatCurrency(order.totalAmount)}
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="px-3 sm:px-6 py-3 sm:py-4">
                       <span
                         className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${
                           order.status === "delivered"
@@ -190,7 +190,7 @@ export default function AdminDashboardPage() {
                         {order.status}
                       </span>
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="px-3 sm:px-6 py-3 sm:py-4">
                       <span
                         className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${
                           order.paymentStatus === "paid"

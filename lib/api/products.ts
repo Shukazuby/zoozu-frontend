@@ -44,6 +44,12 @@ export const productsApi = {
     return response.data;
   },
 
+  // Create product (admin)
+  createProduct: async (data: FormData): Promise<BaseResponse<Product>> => {
+    const response = await apiClient.post('/product/upload/img', data);
+    return response.data;
+  },
+
   // Update product (admin)
   updateProduct: async (id: string, data: Partial<Product>): Promise<BaseResponse<Product>> => {
     const response = await apiClient.patch(`/product/${id}`, data);

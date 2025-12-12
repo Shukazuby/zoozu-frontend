@@ -59,14 +59,14 @@ export default function AdminOrdersPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       <div>
-        <h1 className="text-3xl font-semibold text-slate-900">Orders Management</h1>
-        <p className="text-slate-600 mt-1">View and manage all orders</p>
+        <h1 className="text-2xl sm:text-3xl font-semibold text-slate-900">Orders Management</h1>
+        <p className="text-sm sm:text-base text-slate-600 mt-1">View and manage all orders</p>
       </div>
 
       {/* Filters */}
-      <div className="flex gap-4">
+      <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
@@ -99,38 +99,39 @@ export default function AdminOrdersPage() {
       )}
 
       <div className="rounded-lg bg-white shadow-sm border border-slate-200 overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full">
+        <div className="overflow-x-auto -mx-4 sm:mx-0">
+          <table className="w-full min-w-[800px]">
             <thead className="bg-slate-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase">Order #</th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase">Customer</th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase">Amount</th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase">Status</th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase">Payment</th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase">Date</th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase">Actions</th>
+                <th className="px-3 sm:px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase">Order #</th>
+                <th className="px-3 sm:px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase">Customer</th>
+                <th className="px-3 sm:px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase">Amount</th>
+                <th className="px-3 sm:px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase">Status</th>
+                <th className="px-3 sm:px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase">Payment</th>
+                <th className="px-3 sm:px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase">Date</th>
+                <th className="px-3 sm:px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-200">
               {orders.map((order) => (
                 <tr key={order._id} className="hover:bg-slate-50">
-                  <td className="px-6 py-4 text-sm font-medium text-slate-900">
+                  <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm font-medium text-slate-900">
                     {order.orderNumber}
                   </td>
-                  <td className="px-6 py-4 text-sm text-slate-700">
-                    {order.userId?.fullName || "Guest"}
-                    <br />
-                    <span className="text-xs text-slate-500">{order.userId?.email || ""}</span>
+                  <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-slate-700">
+                    <div className="min-w-0">
+                      <div className="truncate">{order.userId?.fullName || "Guest"}</div>
+                      <span className="text-xs text-slate-500 truncate block">{order.userId?.email || ""}</span>
+                    </div>
                   </td>
-                  <td className="px-6 py-4 text-sm font-semibold text-slate-900">
+                  <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm font-semibold text-slate-900">
                     {formatCurrency(order.totalAmount)}
                   </td>
-                  <td className="px-6 py-4">
+                  <td className="px-3 sm:px-6 py-3 sm:py-4">
                     <select
                       value={order.status}
                       onChange={(e) => handleStatusUpdate(order._id, e.target.value)}
-                      className="rounded border border-slate-300 px-2 py-1 text-xs font-semibold text-slate-900 outline-none focus:border-yellow-600"
+                      className="rounded border border-slate-300 px-2 py-1 text-xs font-semibold text-slate-900 outline-none focus:border-yellow-600 w-full sm:w-auto"
                     >
                       <option value="pending">Pending</option>
                       <option value="processing">Processing</option>
@@ -139,7 +140,7 @@ export default function AdminOrdersPage() {
                       <option value="cancelled">Cancelled</option>
                     </select>
                   </td>
-                  <td className="px-6 py-4">
+                  <td className="px-3 sm:px-6 py-3 sm:py-4">
                     <span
                       className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${
                         order.paymentStatus === "paid"
@@ -152,13 +153,13 @@ export default function AdminOrdersPage() {
                       {order.paymentStatus}
                     </span>
                   </td>
-                  <td className="px-6 py-4 text-xs text-slate-600">
+                  <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs text-slate-600">
                     {formatDate(order.createdAt)}
                   </td>
-                  <td className="px-6 py-4">
+                  <td className="px-3 sm:px-6 py-3 sm:py-4">
                     <a
                       href={`/admin/orders/${order._id}`}
-                      className="text-sm font-semibold text-yellow-700 hover:text-yellow-600"
+                      className="text-xs sm:text-sm font-semibold text-yellow-700 hover:text-yellow-600"
                     >
                       View
                     </a>
@@ -176,22 +177,22 @@ export default function AdminOrdersPage() {
         )}
 
         {total > limit && (
-          <div className="px-6 py-4 border-t border-slate-200 flex items-center justify-between">
-            <p className="text-sm text-slate-600">
+          <div className="px-4 sm:px-6 py-4 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3">
+            <p className="text-xs sm:text-sm text-slate-600 text-center sm:text-left">
               Showing {(page - 1) * limit + 1} to {Math.min(page * limit, total)} of {total} orders
             </p>
             <div className="flex gap-2">
               <button
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
                 disabled={page === 1}
-                className="rounded border border-slate-300 px-3 py-1 text-sm font-semibold text-slate-700 transition hover:border-yellow-500 disabled:opacity-50"
+                className="rounded border border-slate-300 px-3 py-1 text-xs sm:text-sm font-semibold text-slate-700 transition hover:border-yellow-500 disabled:opacity-50"
               >
                 Previous
               </button>
               <button
                 onClick={() => setPage((p) => p + 1)}
                 disabled={page * limit >= total}
-                className="rounded border border-slate-300 px-3 py-1 text-sm font-semibold text-slate-700 transition hover:border-yellow-500 disabled:opacity-50"
+                className="rounded border border-slate-300 px-3 py-1 text-xs sm:text-sm font-semibold text-slate-700 transition hover:border-yellow-500 disabled:opacity-50"
               >
                 Next
               </button>

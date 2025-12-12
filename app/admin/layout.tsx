@@ -16,6 +16,7 @@ export default function AdminLayout({
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
   const [isLoginPage, setIsLoginPage] = useState(pathname === "/admin/login");
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     const checkAdminAuth = async () => {
@@ -91,10 +92,31 @@ export default function AdminLayout({
 
   return (
     <div className="flex min-h-screen bg-slate-50">
-      <AdminSidebar />
+      <AdminSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
       <main className="flex-1 overflow-x-hidden">
-        <div className="container mx-auto px-4 py-8">{children}</div>
+        {/* Mobile menu button */}
+        <div className="lg:hidden bg-white border-b border-slate-200 px-4 py-3 flex items-center justify-between">
+          <button
+            onClick={() => setSidebarOpen(true)}
+            className="p-2 rounded-lg text-slate-700 hover:bg-slate-100"
+            aria-label="Open menu"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+          <span className="font-semibold text-slate-900">Admin Panel</span>
+          <div className="w-10"></div>
+        </div>
+        <div className="container mx-auto px-4 py-4 sm:py-6 lg:py-8">{children}</div>
       </main>
+      {/* Mobile sidebar overlay */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
     </div>
   );
 }

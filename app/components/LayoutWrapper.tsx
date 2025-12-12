@@ -6,10 +6,11 @@ import Footer from "./Footer";
 
 export default function LayoutWrapper({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const isAdminRoute = pathname?.startsWith("/admin") && pathname !== "/admin/login";
+  // Exclude Navbar/Footer for all admin routes including login
+  const isAdminRoute = pathname?.startsWith("/admin");
 
   if (isAdminRoute) {
-    // Admin routes: no Navbar/Footer
+    // Admin routes (including login): no Navbar/Footer
     return <>{children}</>;
   }
 

@@ -69,10 +69,10 @@ export default function AdminUsersPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       <div>
-        <h1 className="text-3xl font-semibold text-slate-900">Users Management</h1>
-        <p className="text-slate-600 mt-1">Manage registered users</p>
+        <h1 className="text-2xl sm:text-3xl font-semibold text-slate-900">Users Management</h1>
+        <p className="text-sm sm:text-base text-slate-600 mt-1">Manage registered users</p>
       </div>
 
       {/* Search */}
@@ -82,7 +82,7 @@ export default function AdminUsersPage() {
           placeholder="Search by name or email..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="w-full max-w-md rounded-lg border border-slate-300 px-4 py-2 text-sm text-slate-900 outline-none focus:border-yellow-600 focus:ring-1 focus:ring-yellow-500"
+          className="w-full sm:max-w-md rounded-lg border border-slate-300 px-4 py-2 text-sm text-slate-900 outline-none focus:border-yellow-600 focus:ring-1 focus:ring-yellow-500"
         />
       </div>
 
@@ -93,25 +93,25 @@ export default function AdminUsersPage() {
       )}
 
       <div className="rounded-lg bg-white shadow-sm border border-slate-200 overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full">
+        <div className="overflow-x-auto -mx-4 sm:mx-0">
+          <table className="w-full min-w-[640px]">
             <thead className="bg-slate-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase">User</th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase">Email</th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase">Phone</th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase">Status</th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase">Joined</th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase">Actions</th>
+                <th className="px-3 sm:px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase">User</th>
+                <th className="px-3 sm:px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase">Email</th>
+                <th className="px-3 sm:px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase">Phone</th>
+                <th className="px-3 sm:px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase">Status</th>
+                <th className="px-3 sm:px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase">Joined</th>
+                <th className="px-3 sm:px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-200">
               {users.map((user) => (
                 <tr key={user._id} className="hover:bg-slate-50">
-                  <td className="px-6 py-4 text-sm font-semibold text-slate-900">{user.fullName}</td>
-                  <td className="px-6 py-4 text-sm text-slate-700">{user.email}</td>
-                  <td className="px-6 py-4 text-sm text-slate-700">{user.phone || "—"}</td>
-                  <td className="px-6 py-4">
+                  <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm font-semibold text-slate-900">{user.fullName}</td>
+                  <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-slate-700 truncate max-w-[150px]">{user.email}</td>
+                  <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-slate-700">{user.phone || "—"}</td>
+                  <td className="px-3 sm:px-6 py-3 sm:py-4">
                     <span
                       className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${
                         user.isActive
@@ -122,14 +122,14 @@ export default function AdminUsersPage() {
                       {user.isActive ? "Active" : "Suspended"}
                     </span>
                   </td>
-                  <td className="px-6 py-4 text-xs text-slate-600">
+                  <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs text-slate-600">
                     {formatDate(user.createdAt)}
                   </td>
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-2">
+                  <td className="px-3 sm:px-6 py-3 sm:py-4">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-2">
                       <button
                         onClick={() => handleToggleStatus(user._id, user.isActive)}
-                        className={`text-sm font-semibold ${
+                        className={`text-xs sm:text-sm font-semibold ${
                           user.isActive
                             ? "text-red-600 hover:text-red-700"
                             : "text-green-600 hover:text-green-700"
@@ -139,7 +139,7 @@ export default function AdminUsersPage() {
                       </button>
                       <button
                         onClick={() => handleDeleteUser(user._id)}
-                        className="text-sm font-semibold text-red-600 hover:text-red-700"
+                        className="text-xs sm:text-sm font-semibold text-red-600 hover:text-red-700"
                       >
                         Delete
                       </button>
@@ -158,22 +158,22 @@ export default function AdminUsersPage() {
         )}
 
         {total > limit && (
-          <div className="px-6 py-4 border-t border-slate-200 flex items-center justify-between">
-            <p className="text-sm text-slate-600">
+          <div className="px-4 sm:px-6 py-4 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3">
+            <p className="text-xs sm:text-sm text-slate-600 text-center sm:text-left">
               Showing {(page - 1) * limit + 1} to {Math.min(page * limit, total)} of {total} users
             </p>
             <div className="flex gap-2">
               <button
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
                 disabled={page === 1}
-                className="rounded border border-slate-300 px-3 py-1 text-sm font-semibold text-slate-700 transition hover:border-yellow-500 disabled:opacity-50"
+                className="rounded border border-slate-300 px-3 py-1 text-xs sm:text-sm font-semibold text-slate-700 transition hover:border-yellow-500 disabled:opacity-50"
               >
                 Previous
               </button>
               <button
                 onClick={() => setPage((p) => p + 1)}
                 disabled={page * limit >= total}
-                className="rounded border border-slate-300 px-3 py-1 text-sm font-semibold text-slate-700 transition hover:border-yellow-500 disabled:opacity-50"
+                className="rounded border border-slate-300 px-3 py-1 text-xs sm:text-sm font-semibold text-slate-700 transition hover:border-yellow-500 disabled:opacity-50"
               >
                 Next
               </button>

@@ -139,10 +139,10 @@ export default function AdminSettingsPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold text-slate-900">Profile Settings</h1>
-        <p className="text-sm text-slate-600 mt-1">Manage your admin account information</p>
+        <h1 className="text-xl sm:text-2xl font-semibold text-slate-900">Profile Settings</h1>
+        <p className="text-xs sm:text-sm text-slate-600 mt-1">Manage your admin account information</p>
       </div>
 
       {error && (
@@ -157,7 +157,7 @@ export default function AdminSettingsPage() {
         </div>
       )}
 
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="grid gap-4 sm:gap-6 grid-cols-1 lg:grid-cols-2">
         {/* Profile Information */}
         <div className="rounded-lg bg-white p-6 shadow-sm border border-slate-200">
           <h2 className="text-lg font-semibold text-slate-900 mb-4">Profile Information</h2>
