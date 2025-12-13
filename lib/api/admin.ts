@@ -70,6 +70,11 @@ export const adminApi = {
     return response.data;
   },
 
+  getOrderById: async (orderId: string): Promise<BaseResponse<any>> => {
+    const response = await apiClient.get(`/admin/orders/${orderId}`);
+    return response.data;
+  },
+
   updateOrderStatus: async (orderId: string, status: string): Promise<BaseResponse<any>> => {
     const response = await apiClient.patch(`/admin/orders/${orderId}/status`, { status });
     return response.data;

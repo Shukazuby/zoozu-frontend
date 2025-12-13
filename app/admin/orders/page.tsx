@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { adminApi } from "@/lib/api";
 
 const formatCurrency = (value: number) => `₦${value.toLocaleString()}`;
@@ -16,26 +17,34 @@ export default function AdminOrdersPage() {
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
   const [statusFilter, setStatusFilter] = useState<string>("");
-  const [paymentStatusFilter, setPaymentStatusFilter] = useState<string>("");
   const limit = 20;
 
   useEffect(() => {
+    // Reset to page 1 when filter changes
+    setPage(1);
+  }, [statusFilter]);
+
+  useEffect(() => {
     loadOrders();
-  }, [page, statusFilter, paymentStatusFilter]);
+  }, [page, statusFilter]);
 
   const loadOrders = async () => {
     try {
       setLoading(true);
+      setError(null);
       const response = await adminApi.getAllOrders(page, limit, {
         status: statusFilter || undefined,
-        paymentStatus: paymentStatusFilter || undefined,
       });
       if (response.success && response.data) {
         setOrders(response.data.orders || []);
         setTotal(response.data.total || 0);
+      } else {
+        setError(response.message || "Failed to load orders");
       }
     } catch (err: any) {
-      setError(err.response?.data?.message || "Failed to load orders");
+      setError(err.response?.data?.message || err.message || "Failed to load orders");
+      setOrders([]);
+      setTotal(0);
     } finally {
       setLoading(false);
     }
@@ -50,10 +59,16 @@ export default function AdminOrdersPage() {
     }
   };
 
-  if (loading && orders.length === 0) {
+  if (loading && orders.length === 0 && page === 1) {
     return (
-      <div className="flex items-center justify-center py-12">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-yellow-600 border-t-transparent"></div>
+      <div className="space-y-4 sm:space-y-6">
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-semibold text-slate-900">Orders Management</h1>
+          <p className="text-sm sm:text-base text-slate-600 mt-1">View and manage all orders</p>
+        </div>
+        <div className="flex items-center justify-center py-12">
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-yellow-600 border-t-transparent"></div>
+        </div>
       </div>
     );
   }
@@ -65,12 +80,13 @@ export default function AdminOrdersPage() {
         <p className="text-sm sm:text-base text-slate-600 mt-1">View and manage all orders</p>
       </div>
 
-      {/* Filters */}
-      <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+      {/* Filter */}
+      <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 sm:items-center">
+        <label className="text-sm font-semibold text-slate-700 whitespace-nowrap">Filter by Status:</label>
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
-          className="rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 outline-none focus:border-yellow-600"
+          className="rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 outline-none focus:border-yellow-600 min-w-[200px]"
         >
           <option value="">All Statuses</option>
           <option value="pending">Pending</option>
@@ -78,17 +94,6 @@ export default function AdminOrdersPage() {
           <option value="shipped">Shipped</option>
           <option value="delivered">Delivered</option>
           <option value="cancelled">Cancelled</option>
-        </select>
-        <select
-          value={paymentStatusFilter}
-          onChange={(e) => setPaymentStatusFilter(e.target.value)}
-          className="rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 outline-none focus:border-yellow-600"
-        >
-          <option value="">All Payment Statuses</option>
-          <option value="pending">Pending</option>
-          <option value="initiated">Initiated</option>
-          <option value="paid">Paid</option>
-          <option value="failed">Failed</option>
         </select>
       </div>
 
@@ -99,6 +104,14 @@ export default function AdminOrdersPage() {
       )}
 
       <div className="rounded-lg bg-white shadow-sm border border-slate-200 overflow-hidden">
+        {loading && orders.length > 0 && (
+          <div className="px-4 sm:px-6 py-3 bg-yellow-50 border-b border-yellow-200">
+            <div className="flex items-center gap-2 text-sm text-yellow-700">
+              <div className="h-4 w-4 animate-spin rounded-full border-2 border-yellow-600 border-t-transparent"></div>
+              <span>Loading...</span>
+            </div>
+          </div>
+        )}
         <div className="overflow-x-auto -mx-4 sm:mx-0">
           <table className="w-full min-w-[800px]">
             <thead className="bg-slate-50">
@@ -113,7 +126,8 @@ export default function AdminOrdersPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-200">
-              {orders.map((order) => (
+              {orders.length > 0 ? (
+                orders.map((order) => (
                 <tr key={order._id} className="hover:bg-slate-50">
                   <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm font-medium text-slate-900">
                     {order.orderNumber}
@@ -156,24 +170,38 @@ export default function AdminOrdersPage() {
                     {formatDate(order.createdAt)}
                   </td>
                   <td className="px-3 sm:px-6 py-3 sm:py-4">
-                    <a
+                    <Link
                       href={`/admin/orders/${order._id}`}
                       className="text-xs sm:text-sm font-semibold text-yellow-700 hover:text-yellow-600"
                     >
                       View
-                    </a>
+                    </Link>
                   </td>
                 </tr>
-              ))}
+              ))
+              ) : (
+                <tr>
+                  <td colSpan={7} className="px-6 py-12 text-center">
+                    <div className="flex flex-col items-center gap-2">
+                      <p className="text-slate-500 font-medium">No orders found</p>
+                      {statusFilter && (
+                        <p className="text-xs text-slate-400">
+                          Try selecting a different status or{" "}
+                          <button
+                            onClick={() => setStatusFilter("")}
+                            className="text-yellow-600 hover:text-yellow-700 font-semibold underline"
+                          >
+                            clear the filter
+                          </button>
+                        </p>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
-
-        {orders.length === 0 && !loading && (
-          <div className="text-center py-12">
-            <p className="text-slate-500">No orders found</p>
-          </div>
-        )}
 
         {total > limit && (
           <div className="px-4 sm:px-6 py-4 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3">

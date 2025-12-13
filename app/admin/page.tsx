@@ -172,7 +172,9 @@ export default function AdminDashboardPage() {
                       {order.orderNumber}
                     </td>
                     <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-slate-700">
-                      {order.user?.fullName || "Guest"}
+                      <div className="min-w-0">
+                        <div className="truncate">{order.contactEmail || "N/A"}</div>
+                      </div>
                     </td>
                     <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm font-semibold text-slate-900">
                       {formatCurrency(order.totalAmount)}
