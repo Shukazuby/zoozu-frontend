@@ -158,13 +158,17 @@ export default function AdminSidebar({ isOpen = false, onClose }: { isOpen?: boo
       <nav className="p-4 space-y-1 flex-1 overflow-y-auto">
         {menuItems.map((item) => {
           const isActive = pathname === item.href || pathname?.startsWith(item.href + "/");
+          // Only Dashboard should have yellow background by default
+          const isDashboard = item.href === "/admin";
           return (
             <Link
               key={item.href}
               href={item.href}
               className={`flex items-center gap-3 px-4 py-3 rounded-lg transition ${
-                isActive
+                isActive && isDashboard
                   ? "bg-yellow-600 text-slate-900 font-semibold"
+                  : isActive
+                  ? "bg-transparent text-white font-semibold border-l-2 border-yellow-600"
                   : "text-slate-300 hover:bg-slate-800 hover:text-white"
               }`}
             >

@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+import { useRouter, useParams } from "next/navigation";
 import { productsApi } from "@/lib/api";
 import Link from "next/link";
+import type { Product } from "@/lib/api/types";
 
 const commonSizes = ["XS", "S", "M", "L", "XL", "XXL", "XXXL"];
 const commonColors = [
@@ -18,11 +19,16 @@ const commonColors = [
   { name: "Green", value: "#008000" },
 ];
 
-export default function AddProductPage() {
+export default function EditProductPage() {
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
+  const params = useParams();
+  const productId = params.id as string;
+
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [product, setProduct] = useState<Product | null>(null);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -37,9 +43,9 @@ export default function AddProductPage() {
     isPreOrder: false,
     isNew: false,
     isFeatured: false,
+    isActive: true,
   });
 
-  const [images, setImages] = useState<string[]>([]);
   const [imageUrls, setImageUrls] = useState<string[]>([]);
   const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
@@ -47,6 +53,52 @@ export default function AddProductPage() {
   const [sizes, setSizes] = useState<string[]>([]);
   const [colors, setColors] = useState<string[]>([]);
   const [colorInput, setColorInput] = useState("");
+
+  useEffect(() => {
+    loadProduct();
+  }, [productId]);
+
+  const loadProduct = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await productsApi.getProductById(productId);
+      
+      if (response.success && response.data) {
+        const productData = response.data as Product;
+        setProduct(productData);
+        
+        // Pre-fill form data
+        setFormData({
+          name: productData.name || "",
+          price: String(productData.price || ""),
+          description: productData.description || "",
+          gender: productData.gender || "men",
+          stock: String(productData.stock || ""),
+          badge: productData.badge || "",
+          tag: productData.tag || "",
+          isAvailable: productData.isAvailable ?? true,
+          isBespoke: productData.isBespoke ?? false,
+          isPreOrder: productData.isPreOrder ?? false,
+          isNew: productData.isNew ?? false,
+          isFeatured: productData.isFeatured ?? false,
+          isActive: productData.isActive ?? true,
+        });
+
+        // Pre-fill arrays
+        setImageUrls(productData.images || []);
+        setCategories(productData.categories || []);
+        setSizes(productData.sizes || []);
+        setColors(productData.colors || []);
+      } else {
+        setError("Product not found");
+      }
+    } catch (err: any) {
+      setError(err.response?.data?.message || "Failed to load product");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleAddCategory = () => {
     if (categoryInput.trim() && !categories.includes(categoryInput.trim())) {
@@ -102,7 +154,8 @@ export default function AddProductPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-    setLoading(true);
+    setSuccess(false);
+    setSaving(true);
 
     try {
       const formDataToSend = new FormData();
@@ -118,6 +171,7 @@ export default function AddProductPage() {
       formDataToSend.append("isPreOrder", String(formData.isPreOrder));
       formDataToSend.append("isNew", String(formData.isNew));
       formDataToSend.append("isFeatured", String(formData.isFeatured));
+      formDataToSend.append("isActive", String(formData.isActive));
 
       if (formData.badge) {
         formDataToSend.append("badge", formData.badge);
@@ -147,51 +201,67 @@ export default function AddProductPage() {
         formDataToSend.append("image", imageFiles[0]);
       }
 
-      const response = await productsApi.createProduct(formDataToSend);
+      const response = await productsApi.updateProduct(productId, formDataToSend);
 
-      // Backend may return product directly or wrapped in response object
-      // Check response structure - axios wraps in response.data
-      const responseData = response as any;
-      
-      // Success if: response has _id (direct product), or success: true, or data._id exists
-      const isSuccess = 
-        responseData?._id || 
-        responseData?.success === true || 
-        (responseData?.data && (responseData.data._id || responseData.data.success));
-      
-      if (isSuccess) {
+      // Backend now returns BaseResponseTypeDTO consistently
+      // Check for success flag or product data in response
+      if (response && response.success === true) {
+        setSuccess(true);
+        setError(null);
+        setTimeout(() => {
+          router.push("/admin/products");
+        }, 2000);
+      } else if (response && response.data) {
+        // Fallback: if response has data but no success flag, treat as success
         setSuccess(true);
         setError(null);
         setTimeout(() => {
           router.push("/admin/products");
         }, 2000);
       } else {
-        setError(responseData?.message || "Failed to create product");
+        // Explicit failure
+        setError(response?.message || "Failed to update product");
       }
     } catch (err: any) {
-      // Check if error response actually contains product data (successful creation)
-      const errorData = err.response?.data;
-      if (errorData && (errorData._id || errorData.data?._id)) {
-        // Product was created successfully
-        setSuccess(true);
-        setError(null);
-        setTimeout(() => {
-          router.push("/admin/products");
-        }, 2000);
-      } else {
-        setError(errorData?.message || err.message || "Failed to create product");
-      }
+      // Handle HTTP errors
+      const errorMessage = err.response?.data?.message || err.message || "Failed to update product";
+      setError(errorMessage);
+      setSuccess(false);
     } finally {
-      setLoading(false);
+      setSaving(false);
     }
   };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-yellow-600 border-t-transparent"></div>
+      </div>
+    );
+  }
+
+  if (error && !product) {
+    return (
+      <div className="space-y-4">
+        <div className="rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
+          {error}
+        </div>
+        <Link
+          href="/admin/products"
+          className="inline-block rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-yellow-500"
+        >
+          ← Back to Products
+        </Link>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4 sm:space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-semibold text-slate-900">Add New Product</h1>
-          <p className="text-sm sm:text-base text-slate-600 mt-1">Create a new product for your catalog</p>
+          <h1 className="text-2xl sm:text-3xl font-semibold text-slate-900">Edit Product</h1>
+          <p className="text-sm sm:text-base text-slate-600 mt-1">Update product information</p>
         </div>
         <Link
           href="/admin/products"
@@ -202,14 +272,26 @@ export default function AddProductPage() {
       </div>
 
       {error && (
-        <div className="rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
-          {error}
+        <div className="rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700 flex items-center justify-between">
+          <span>{error}</span>
+          <button
+            onClick={() => setError(null)}
+            className="ml-4 text-red-700 hover:text-red-900"
+          >
+            ×
+          </button>
         </div>
       )}
 
       {success && (
-        <div className="rounded-lg bg-green-50 border border-green-200 px-4 py-3 text-sm text-green-700">
-          Product created successfully! Redirecting...
+        <div className="rounded-lg bg-green-50 border border-green-200 px-4 py-3 text-sm text-green-700 flex items-center justify-between">
+          <span>Product updated successfully! Redirecting...</span>
+          <button
+            onClick={() => setSuccess(false)}
+            className="ml-4 text-green-700 hover:text-green-900"
+          >
+            ×
+          </button>
         </div>
       )}
 
@@ -483,7 +565,7 @@ export default function AddProductPage() {
 
             {/* Image File Upload */}
             <div>
-              <label className="block text-sm font-semibold text-slate-800 mb-2">Upload Image File</label>
+              <label className="block text-sm font-semibold text-slate-800 mb-2">Upload New Image File</label>
               <input
                 type="file"
                 accept="image/*"
@@ -543,6 +625,16 @@ export default function AddProductPage() {
             </div>
 
             <div className="mt-4 space-y-3">
+              <label className="flex items-center gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={formData.isActive}
+                  onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
+                  className="h-4 w-4 rounded border-slate-300 text-yellow-600 focus:ring-yellow-500"
+                />
+                <span className="text-sm font-semibold text-slate-800">Active (visible to customers)</span>
+              </label>
+
               <label className="flex items-center gap-3 cursor-pointer">
                 <input
                   type="checkbox"
@@ -606,10 +698,10 @@ export default function AddProductPage() {
           </Link>
           <button
             type="submit"
-            disabled={loading}
+            disabled={saving}
             className="w-full sm:w-auto rounded-lg bg-yellow-600 px-6 py-2 text-sm font-semibold text-slate-900 transition hover:bg-yellow-500 disabled:cursor-not-allowed disabled:opacity-70"
           >
-            {loading ? "Creating Product..." : "Create Product"}
+            {saving ? "Updating Product..." : "Update Product"}
           </button>
         </div>
       </form>

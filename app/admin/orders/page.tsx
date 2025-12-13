@@ -120,8 +120,7 @@ export default function AdminOrdersPage() {
                   </td>
                   <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-slate-700">
                     <div className="min-w-0">
-                      <div className="truncate">{order.userId?.fullName || "Guest"}</div>
-                      <span className="text-xs text-slate-500 truncate block">{order.userId?.email || ""}</span>
+                      <div className="truncate">{order.contactEmail || "N/A"}</div>
                     </div>
                   </td>
                   <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm font-semibold text-slate-900">

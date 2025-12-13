@@ -49,12 +49,30 @@ export default function AdminProductsPage() {
     }
   };
 
-  const toggleProductStatus = async (productId: string, isActive: boolean) => {
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
+  const handleDeleteProduct = async (productId: string, productName: string) => {
+    if (!confirm(`Are you sure you want to delete "${productName}"? This action cannot be undone.`)) {
+      return;
+    }
+
     try {
-      await productsApi.updateProduct(productId, { isActive: !isActive });
-      loadProducts();
+      setDeletingId(productId);
+      const response = await productsApi.deleteProduct(productId);
+      if (response.success) {
+        setSuccessMessage("Product deleted successfully");
+        setTimeout(() => setSuccessMessage(null), 3000);
+        loadProducts();
+      } else {
+        setError(response.message || "Failed to delete product");
+        setTimeout(() => setError(null), 5000);
+      }
     } catch (err: any) {
-      alert(err.response?.data?.message || "Failed to update product");
+      setError(err.response?.data?.message || "Failed to delete product");
+      setTimeout(() => setError(null), 5000);
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -82,8 +100,26 @@ export default function AdminProductsPage() {
       </div>
 
       {error && (
-        <div className="rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
-          {error}
+        <div className="rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700 flex items-center justify-between">
+          <span>{error}</span>
+          <button
+            onClick={() => setError(null)}
+            className="ml-4 text-red-700 hover:text-red-900"
+          >
+            ×
+          </button>
+        </div>
+      )}
+
+      {successMessage && (
+        <div className="rounded-lg bg-green-50 border border-green-200 px-4 py-3 text-sm text-green-700 flex items-center justify-between">
+          <span>{successMessage}</span>
+          <button
+            onClick={() => setSuccessMessage(null)}
+            className="ml-4 text-green-700 hover:text-green-900"
+          >
+            ×
+          </button>
         </div>
       )}
 
@@ -142,20 +178,17 @@ export default function AdminProductsPage() {
                   <td className="px-3 sm:px-6 py-3 sm:py-4">
                     <div className="flex flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-2">
                       <Link
-                        href={`/admin/products/${product._id}`}
+                        href={`/admin/products/${product._id}/edit`}
                         className="text-xs sm:text-sm font-semibold text-yellow-700 hover:text-yellow-600"
                       >
                         Edit
                       </Link>
                       <button
-                        onClick={() => toggleProductStatus(product._id, product.isActive || false)}
-                        className={`text-xs sm:text-sm font-semibold ${
-                          product.isActive
-                            ? "text-red-600 hover:text-red-700"
-                            : "text-green-600 hover:text-green-700"
-                        }`}
+                        onClick={() => handleDeleteProduct(product._id, product.name)}
+                        disabled={deletingId === product._id}
+                        className="text-xs sm:text-sm font-semibold text-red-600 hover:text-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
-                        {product.isActive ? "Deactivate" : "Activate"}
+                        {deletingId === product._id ? "Deleting..." : "Delete"}
                       </button>
                     </div>
                   </td>

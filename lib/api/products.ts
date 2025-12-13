@@ -51,8 +51,19 @@ export const productsApi = {
   },
 
   // Update product (admin)
-  updateProduct: async (id: string, data: Partial<Product>): Promise<BaseResponse<Product>> => {
-    const response = await apiClient.patch(`/product/${id}`, data);
+  updateProduct: async (id: string, data: Partial<Product> | FormData): Promise<BaseResponse<Product>> => {
+    // Use different endpoint for FormData (multipart/form-data) vs JSON
+    const endpoint = data instanceof FormData 
+      ? `/product/${id}/product/image` 
+      : `/product/${id}`;
+    
+    const response = await apiClient.patch(endpoint, data);
+    return response.data;
+  },
+
+  // Delete product (admin)
+  deleteProduct: async (id: string): Promise<BaseResponse<void>> => {
+    const response = await apiClient.delete(`/product/${id}`);
     return response.data;
   },
 };
