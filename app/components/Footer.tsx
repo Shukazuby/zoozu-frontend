@@ -5,20 +5,23 @@ import Image from "next/image";
 import { useState } from "react";
 import { newsletterApi } from "@/lib/api/newsletter";
 
-const footerLinks = {
-  shop: [
-    { label: "Men's Collection", href: "/collections/men" },
-    { label: "Women's Collection", href: "/collections/women" },
-    { label: "All Collections", href: "/collections" },
-    // { label: "Accessories", href: "/collections" },
-  ],
-  company: [
-    { label: "About Us", href: "/about" },
-    { label: "Contact", href: "/contact" },
-    { label: "Book a Fitting", href: "/bespoke-fitting" },
-    { label: "Terms & Conditions", href: "/terms" },
-  ],
-};
+const shopLinks = [
+  { label: "Men", href: "/collections/men" },
+  { label: "Women", href: "/collections/women" },
+  { label: "Collections", href: "/collections" },
+];
+
+const companyLinks = [
+  { label: "About", href: "/about" },
+  { label: "Contact", href: "/contact" },
+  { label: "Fitting", href: "/bespoke-fitting" },
+  { label: "Terms", href: "/terms" },
+];
+
+const legalLinks = [
+  { label: "Privacy", href: "/terms#privacy" },
+  { label: "Shipping", href: "/terms#shipping" },
+];
 
 const socials = [
   { label: "X", href: "#" },
@@ -26,11 +29,41 @@ const socials = [
   { label: "FB", href: "#" },
 ];
 
+function LinkColumn({
+  title,
+  links,
+}: {
+  title: string;
+  links: { label: string; href: string }[];
+}) {
+  return (
+    <div>
+      <p className="mb-2 text-[10px] font-semibold uppercase tracking-widest text-white">
+        {title}
+      </p>
+      <ul className="space-y-1 text-xs text-neutral-400">
+        {links.map((item) => (
+          <li key={item.href}>
+            <Link
+              href={item.href}
+              className="transition hover:text-yellow-500"
+            >
+              {item.label}
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
 export default function Footer() {
   const [email, setEmail] = useState("");
-  const [name, setName] = useState("");
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [message, setMessage] = useState<{
+    type: "success" | "error";
+    text: string;
+  } | null>(null);
 
   const validateEmail = (email: string): boolean => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -41,14 +74,13 @@ export default function Footer() {
     e.preventDefault();
     setMessage(null);
 
-    // Validate email format
     if (!email.trim()) {
-      setMessage({ type: 'error', text: 'Please enter your email address.' });
+      setMessage({ type: "error", text: "Enter your email." });
       return;
     }
 
     if (!validateEmail(email)) {
-      setMessage({ type: 'error', text: 'Please enter a valid email address.' });
+      setMessage({ type: "error", text: "Invalid email address." });
       return;
     }
 
@@ -57,49 +89,59 @@ export default function Footer() {
     try {
       const response = await newsletterApi.subscribe({
         email: email.trim(),
-        name: name.trim() || undefined,
       });
 
       if (response.success) {
-        setMessage({ type: 'success', text: response.message || 'Thank you for joining the Inner Circle!' });
+        setMessage({
+          type: "success",
+          text: response.message || "You're in!",
+        });
         setEmail("");
-        setName("");
       } else {
-        setMessage({ type: 'error', text: response.message || 'Failed to subscribe. Please try again.' });
+        setMessage({
+          type: "error",
+          text: response.message || "Subscription failed.",
+        });
       }
-    } catch (error: any) {
-      const errorMessage = error.response?.data?.message || error.message || 'Failed to subscribe. Please try again.';
-      setMessage({ type: 'error', text: errorMessage });
+    } catch (error: unknown) {
+      const err = error as {
+        response?: { data?: { message?: string } };
+        message?: string;
+      };
+      const errorMessage =
+        err.response?.data?.message ||
+        err.message ||
+        "Subscription failed.";
+      setMessage({ type: "error", text: errorMessage });
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <footer className="bg-slate-900 text-slate-200">
-      <div className="mx-auto flex max-w-6xl flex-col gap-12 px-4 py-14 md:px-6 lg:px-8">
-        <div className="grid gap-10 md:grid-cols-4">
-          <div className="space-y-4 text-sm leading-relaxed text-slate-300">
-            <div className="flex items-center gap-2 font-semibold text-white">
+    <footer className="bg-black text-neutral-400">
+      <div className="mx-auto max-w-6xl px-4 py-5 md:px-6 md:py-6 lg:px-8">
+        <div className="flex flex-col gap-5 md:flex-row md:items-start md:justify-between md:gap-8">
+          {/* Brand */}
+          <div className="flex shrink-0 items-center justify-between gap-4 md:flex-col md:items-start md:justify-start">
+            <Link href="/" className="flex items-center gap-2">
               <Image
                 src="https://res.cloudinary.com/dkqtwvhq2/image/upload/v1765556450/zoozu_logo_lm422a.jpg"
                 alt="ZOOZU_NG Logo"
-                width={32}
-                height={32}
-                className="h-8 w-8 rounded-lg object-contain"
+                width={24}
+                height={24}
+                className="h-6 w-6 rounded object-contain"
               />
-              ZOOZU_NG
-            </div>
-            <p>
-              Premium African fashion bridging the gap between tradition and
-              modern luxury. Designed in Lagos, worn globally.
-            </p>
-            <div className="flex gap-2">
+              <span className="text-xs font-semibold tracking-wide text-white">
+                ZOOZU_NG
+              </span>
+            </Link>
+            <div className="flex gap-1.5">
               {socials.map((item) => (
                 <Link
                   key={item.label}
                   href={item.href}
-                  className="grid h-8 w-8 place-items-center rounded-sm border border-slate-700 text-xs font-semibold transition hover:border-yellow-500 hover:text-yellow-400"
+                  className="grid h-6 w-6 place-items-center rounded border border-neutral-800 text-[10px] font-medium text-neutral-500 transition hover:border-yellow-500 hover:text-yellow-500"
                 >
                   {item.label}
                 </Link>
@@ -107,100 +149,73 @@ export default function Footer() {
             </div>
           </div>
 
-          <div className="space-y-4">
-            <h4 className="text-sm font-semibold text-white">Shop</h4>
-            <ul className="space-y-2 text-sm text-slate-300">
-              {footerLinks.shop.map((item) => (
-                <li key={item.label}>
-                  <Link href={item.href} className="transition hover:text-yellow-400">
-                    {item.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
+          {/* Links */}
+          <div className="grid grid-cols-2 gap-6 sm:gap-10 md:gap-12">
+            <LinkColumn title="Shop" links={shopLinks} />
+            <LinkColumn title="Company" links={companyLinks} />
           </div>
 
-          <div className="space-y-4">
-            <h4 className="text-sm font-semibold text-white">Company</h4>
-            <ul className="space-y-2 text-sm text-slate-300">
-              {footerLinks.company.map((item) => (
-                <li key={item.label}>
-                  <Link href={item.href} className="transition hover:text-yellow-400">
-                    {item.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div className="space-y-4">
-            <h4 className="text-sm font-semibold text-white">Join the Inner Circle</h4>
-            <p className="text-sm text-slate-300">
-              Subscribe for exclusive access to new drops and private sales.
+          {/* Newsletter */}
+          <div className="w-full md:max-w-xs">
+            <p className="mb-2 text-[10px] font-semibold uppercase tracking-widest text-white">
+              Newsletter
             </p>
-            <form onSubmit={handleSubmit} className="space-y-3">
-              {message && (
-                <div
-                  className={`rounded-sm px-3 py-2 text-xs ${
-                    message.type === 'success'
-                      ? 'bg-green-900/50 text-green-300 border border-green-700'
-                      : 'bg-red-900/50 text-red-300 border border-red-700'
-                  }`}
-                >
-                  {message.text}
-                </div>
-              )}
-              <div className="space-y-2">
-                <label className="flex rounded-sm border border-slate-700 bg-slate-800/60">
-                  <span className="sr-only">Email address</span>
+            <form onSubmit={handleSubmit} className="space-y-1.5">
+              <div className="flex gap-1.5">
+                <label className="min-w-0 flex-1 rounded border border-neutral-800 bg-neutral-950">
+                  <span className="sr-only">Email</span>
                   <input
                     type="email"
                     name="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="Your email address"
+                    placeholder="Email address"
                     required
                     disabled={loading}
-                    className="w-full bg-transparent px-3 py-2 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-yellow-500 disabled:opacity-50"
+                    className="w-full bg-transparent px-2.5 py-1.5 text-xs text-white placeholder:text-neutral-600 focus:outline-none disabled:opacity-50"
                   />
                 </label>
-                <label className="flex rounded-sm border border-slate-700 bg-slate-800/60">
-                  <span className="sr-only">Name (optional)</span>
-                  <input
-                    type="text"
-                    name="name"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    placeholder="Your name (optional)"
-                    disabled={loading}
-                    className="w-full bg-transparent px-3 py-2 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-yellow-500 disabled:opacity-50"
-                  />
-                </label>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="shrink-0 rounded bg-yellow-500 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wide text-black transition hover:bg-yellow-400 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  {loading ? "…" : "Join"}
+                </button>
               </div>
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full rounded-sm bg-yellow-500 px-4 py-2 text-sm font-semibold text-slate-900 transition hover:bg-yellow-400 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {loading ? 'SUBSCRIBING...' : 'SUBSCRIBE'}
-              </button>
+              {message && (
+                <p
+                  className={`text-[10px] leading-tight ${
+                    message.type === "success"
+                      ? "text-green-500"
+                      : "text-red-400"
+                  }`}
+                >
+                  {message.text}
+                </p>
+              )}
             </form>
           </div>
         </div>
 
-        <div className="flex flex-col gap-2 border-t border-slate-800 pt-6 text-xs text-slate-500 md:flex-row md:items-center md:justify-between">
-          <p>© 2024 ZOOZU_ng Fashion Ltd. All rights reserved.</p>
-          <div className="flex gap-4">
-            <Link href="/terms#privacy" className="transition hover:text-yellow-400">
-              Privacy Policy
-            </Link>
-            <Link href="/terms#shipping" className="transition hover:text-yellow-400">
-              Shipping Info
-            </Link>
+        {/* Bottom bar */}
+        <div className="mt-5 flex flex-col gap-2 border-t border-neutral-900 pt-4 text-[10px] text-neutral-600 sm:flex-row sm:items-center sm:justify-between">
+          <p>
+            © {new Date().getFullYear()} Zoozu_ng Fashion Ltd.
+          </p>
+          <div className="flex gap-3">
+            {legalLinks.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className="transition hover:text-yellow-500"
+              >
+                {item.label}
+              </Link>
+            ))}
           </div>
         </div>
       </div>
     </footer>
   );
 }
-
