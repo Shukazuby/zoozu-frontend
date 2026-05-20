@@ -319,7 +319,7 @@ export default function HomeClient() {
                 className="object-cover"
               />
             </div>
-            <div className="absolute -left-10 -bottom-12 hidden h-[220px] w-[240px] overflow-hidden rounded-lg shadow-md md:block">
+            <div className="absolute left-4 -bottom-6 block h-[140px] w-[160px] overflow-hidden rounded-lg shadow-md md:-left-10 md:-bottom-12 md:h-[220px] md:w-[240px]">
               <Image
                 src="https://res.cloudinary.com/dkqtwvhq2/image/upload/v1779229795/IMG_6148_lkiivc.jpg"
                 alt="Zoozu_ng"
