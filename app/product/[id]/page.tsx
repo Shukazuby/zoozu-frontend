@@ -14,14 +14,29 @@ export default function ProductDetailsPage() {
   const params = useParams();
   const router = useRouter();
   const productId = params?.id as string;
-  const { product, loading, error, getProductById, featuredProducts, getFeaturedProducts } = useProducts();
+  const {
+    product,
+    loading,
+    error,
+    getProductById,
+    featuredProducts,
+    getFeaturedProducts,
+  } = useProducts();
   const { addToCart } = useCart();
-  const { isSaved, add: saveItem, remove: removeItem, loading: saveLoading } = useSavedItems(productId);
+  const {
+    isSaved,
+    add: saveItem,
+    remove: removeItem,
+    loading: saveLoading,
+  } = useSavedItems(productId);
   const [selectedSize, setSelectedSize] = useState<string>("");
   const [selectedColor, setSelectedColor] = useState<string>("");
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [addingToCart, setAddingToCart] = useState(false);
-  const [toast, setToast] = useState<{ show: boolean; message: string }>({ show: false, message: "" });
+  const [toast, setToast] = useState<{ show: boolean; message: string }>({
+    show: false,
+    message: "",
+  });
   const [hasAttemptedFetch, setHasAttemptedFetch] = useState(false);
 
   useEffect(() => {
@@ -50,7 +65,6 @@ export default function ProductDetailsPage() {
       if (product.colors && product.colors.length > 0 && !selectedColor) {
         setSelectedColor(product.colors[0]);
       }
-
     }
   }, [product, productId]);
 
@@ -72,7 +86,11 @@ export default function ProductDetailsPage() {
 
   // Show loading state while fetching
   // Show loading if: currently loading OR we haven't attempted fetch yet OR we're waiting for product after fetch started
-  if (loading || !hasAttemptedFetch || (hasAttemptedFetch && !product && !error)) {
+  if (
+    loading ||
+    !hasAttemptedFetch ||
+    (hasAttemptedFetch && !product && !error)
+  ) {
     return (
       <div className="bg-white pb-24 pt-10">
         <div className="container">
@@ -88,27 +106,26 @@ export default function ProductDetailsPage() {
   // Only show error if we've attempted to fetch, loading is complete, and we have an error or no product
   if (hasAttemptedFetch && !loading && (error || !product)) {
     // Check if it's a 404 or "not found" error
-    const isNotFound = error?.toLowerCase().includes('not found') || 
-                      error?.toLowerCase().includes('404') ||
-                      (!error && !product);
-    
+    const isNotFound =
+      error?.toLowerCase().includes("not found") ||
+      error?.toLowerCase().includes("404") ||
+      (!error && !product);
+
     return (
       <div className="bg-white pb-24 pt-10">
         <div className="container">
           <div className="text-center py-12 space-y-4">
             <p className="text-red-600">
-              {isNotFound 
-                ? "Product not found" 
+              {isNotFound
+                ? "Product not found"
                 : error || "Failed to load product. Please try again."}
             </p>
             {error && !isNotFound && (
-              <p className="text-sm text-slate-600 mt-2">
-                {error}
-              </p>
+              <p className="text-sm text-slate-600 mt-2">{error}</p>
             )}
             <div className="flex gap-4 justify-center mt-6">
-              <Link 
-                href="/collections" 
+              <Link
+                href="/collections"
                 className="inline-block rounded bg-yellow-600 px-6 py-2 text-sm font-semibold text-white transition hover:bg-yellow-500"
               >
                 ← Back to Collections
@@ -136,8 +153,10 @@ export default function ProductDetailsPage() {
     return null;
   }
 
-  const images = product.images && product.images.length > 0 ? product.images : [];
-  const displayImage = images[selectedImageIndex] || (images.length > 0 ? images[0] : null);
+  const images =
+    product.images && product.images.length > 0 ? product.images : [];
+  const displayImage =
+    images[selectedImageIndex] || (images.length > 0 ? images[0] : null);
 
   return (
     <div className="bg-white pb-24 pt-10">
@@ -169,10 +188,17 @@ export default function ProductDetailsPage() {
                     key={idx}
                     onClick={() => setSelectedImageIndex(idx)}
                     className={`relative h-24 w-full overflow-hidden rounded border transition ${
-                      selectedImageIndex === idx ? "border-yellow-500 ring-2 ring-yellow-300" : "border-slate-200 hover:border-yellow-500"
+                      selectedImageIndex === idx
+                        ? "border-yellow-500 ring-2 ring-yellow-300"
+                        : "border-slate-200 hover:border-yellow-500"
                     }`}
                   >
-                    <Image src={thumb} alt={`${product.name} - Image ${idx + 1}`} fill className="object-cover" />
+                    <Image
+                      src={thumb}
+                      alt={`${product.name} - Image ${idx + 1}`}
+                      fill
+                      className="object-cover"
+                    />
                   </button>
                 ))}
               </div>
@@ -195,10 +221,16 @@ export default function ProductDetailsPage() {
             )}
 
             <div className="space-y-3">
-              <h1 className="text-4xl font-semibold text-slate-900 leading-tight">{product.name}</h1>
-              <p className="text-lg font-semibold text-yellow-700">{formatCurrency(product.price)}</p>
+              <h1 className="text-4xl font-semibold text-slate-900 leading-tight">
+                {product.name}
+              </h1>
+              <p className="text-lg font-semibold text-yellow-700">
+                {formatCurrency(product.price)}
+              </p>
               {product.description && (
-                <p className="max-w-xl text-sm text-slate-700 leading-relaxed">{product.description}</p>
+                <p className="max-w-xl text-sm text-slate-700 leading-relaxed">
+                  {product.description}
+                </p>
               )}
               {product.badge && (
                 <span className="inline-block rounded-sm bg-yellow-500 px-3 py-1 text-xs font-semibold text-slate-900">
@@ -243,7 +275,9 @@ export default function ProductDetailsPage() {
                       onClick={() => setSelectedColor(color)}
                       style={{ backgroundColor: color }}
                       className={`h-8 w-8 rounded-full border shadow-sm transition ${
-                        selectedColor === color ? "border-yellow-500 ring-2 ring-yellow-300" : "border-slate-200 hover:border-yellow-500"
+                        selectedColor === color
+                          ? "border-yellow-500 ring-2 ring-yellow-300"
+                          : "border-slate-200 hover:border-yellow-500"
                       }`}
                       aria-label={`Color ${color}`}
                     />
@@ -266,7 +300,9 @@ export default function ProductDetailsPage() {
                 onClick={async () => {
                   if (!productId) return;
                   if (!tokenManager.isAuthenticated()) {
-                    router.push(`/auth/login?next=${encodeURIComponent(`/product/${productId}`)}`);
+                    router.push(
+                      `/auth/login?next=${encodeURIComponent(`/product/${productId}`)}`,
+                    );
                     return;
                   }
                   const ok = isSaved ? await removeItem() : await saveItem();
@@ -285,24 +321,38 @@ export default function ProductDetailsPage() {
 
             <ul className="space-y-2 text-sm text-slate-700">
               <li className="flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 5h11l1 4h4l1 5H7l-1-4" />
-                  <circle cx="8.5" cy="17.5" r="1.25" />
-                  <circle cx="17.5" cy="17.5" r="1.25" />
-                </svg>
-                Free shipping on orders over ₦100,000
-              </li>
-              <li className="flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="m5 13 4 4L19 7" />
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-4 w-4 text-slate-500"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={1.8}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="m5 13 4 4L19 7"
+                  />
                 </svg>
                 Authentic premium fabric
               </li>
               <li className="flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 4h7v4H5v8h6v4H4zm10 0h6v16h-6v-4h5V8h-5z" />
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-4 w-4 text-slate-500"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={1.8}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="m5 13 4 4L19 7"
+                  />
                 </svg>
-                Easy returns &amp; exchanges
+                Specify color and size preferences in checkout
               </li>
             </ul>
           </div>
@@ -310,9 +360,13 @@ export default function ProductDetailsPage() {
 
         {/* You May Also Like Section */}
         <div className="space-y-4">
-          <h2 className="text-xl font-semibold text-slate-900">You May Also Like</h2>
+          <h2 className="text-xl font-semibold text-slate-900">
+            You May Also Like
+          </h2>
           {!featuredProducts || featuredProducts.length === 0 ? (
-            <p className="text-sm text-slate-600">No featured products available at the moment.</p>
+            <p className="text-sm text-slate-600">
+              No featured products available at the moment.
+            </p>
           ) : (
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
               {featuredProducts.slice(0, 4).map((item: Product) => (
@@ -337,8 +391,12 @@ export default function ProductDetailsPage() {
                     )}
                   </div>
                   <div className="p-4 space-y-1">
-                    <p className="text-sm font-semibold text-slate-800">{item.name}</p>
-                    <p className="text-sm font-semibold text-yellow-700">{formatCurrency(item.price)}</p>
+                    <p className="text-sm font-semibold text-slate-800">
+                      {item.name}
+                    </p>
+                    <p className="text-sm font-semibold text-yellow-700">
+                      {formatCurrency(item.price)}
+                    </p>
                   </div>
                 </Link>
               ))}
@@ -349,4 +407,3 @@ export default function ProductDetailsPage() {
     </div>
   );
 }
-

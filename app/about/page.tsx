@@ -82,7 +82,7 @@ export default function AboutPage() {
               href="/collections"
               className="inline-flex items-center justify-center rounded-full bg-yellow-500 px-6 py-3 text-sm font-semibold text-slate-950 transition hover:bg-yellow-400"
             >
-              Browse the Story
+              See Collections
             </Link>
           </div>
         </div>

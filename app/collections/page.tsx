@@ -9,20 +9,47 @@ import { useSearchParams } from "next/navigation";
 
 const formatCurrency = (value: number) => `₦${value.toLocaleString()}`;
 
-const categoryOptions = ["All", "Dress", "Jalabiya", "Agbada", "Kaftan", "Ankara", "Ready-to-Wear", "Two-Piece ", "Two-Piece ", "Bou-Bou"];
-const priceOptions = ["All Prices", "Under ₦30,000", "₦30,000 - ₦60,000", "₦60,000 - ₦100,000", "Over ₦100,000"];
+const categoryOptions = [
+  "All",
+  "Dress",
+  "Jalabiya",
+  "Agbada",
+  "Kaftan",
+  "Ankara",
+  "Ready-to-Wear",
+  // "Two-Piece ",
+  "Boubou",
+];
+const priceOptions = [
+  "All Prices",
+  "Under ₦30,000",
+  "₦30,000 - ₦60,000",
+  "₦60,000 - ₦100,000",
+  "Over ₦100,000",
+];
 const availabilityOptions = ["All", "In Stock", "Pre-Order"];
-const sortOptions = ["New Arrivals", "Price: Low to High", "Price: High to Low", "Most Popular", "Name: A-Z"];
+const sortOptions = [
+  "New Arrivals",
+  "Price: Low to High",
+  "Price: High to Low",
+  "Most Popular",
+  "Name: A-Z",
+];
 
 function CollectionsContent() {
   const { products, loading, error, getProducts } = useProducts();
   const searchParams = useSearchParams();
   const searchQuery = searchParams?.get("search") || "";
-  
-  const [selectedCategoryButton, setSelectedCategoryButton] = useState<string>("All Collections");
-  const [selectedCategory, setSelectedCategory] = useState<string | undefined>();
+
+  const [selectedCategoryButton, setSelectedCategoryButton] =
+    useState<string>("All Collections");
+  const [selectedCategory, setSelectedCategory] = useState<
+    string | undefined
+  >();
   const [selectedPrice, setSelectedPrice] = useState<string | undefined>();
-  const [selectedAvailability, setSelectedAvailability] = useState<string | undefined>();
+  const [selectedAvailability, setSelectedAvailability] = useState<
+    string | undefined
+  >();
   const [selectedSort, setSelectedSort] = useState("New Arrivals");
 
   useEffect(() => {
@@ -98,7 +125,15 @@ function CollectionsContent() {
     }
 
     getProducts(filters);
-  }, [selectedCategoryButton, selectedCategory, selectedPrice, selectedAvailability, selectedSort, searchQuery, getProducts]);
+  }, [
+    selectedCategoryButton,
+    selectedCategory,
+    selectedPrice,
+    selectedAvailability,
+    selectedSort,
+    searchQuery,
+    getProducts,
+  ]);
 
   return (
     <div className="bg-white pb-16 pt-12">
@@ -106,17 +141,27 @@ function CollectionsContent() {
         <div className="text-center space-y-3">
           {searchQuery ? (
             <>
-              <h1 className="text-4xl font-semibold text-slate-900">Search Results</h1>
+              <h1 className="text-4xl font-semibold text-slate-900">
+                Search Results
+              </h1>
               <p className="text-base text-slate-600 max-w-2xl mx-auto">
-                Showing results for: <span className="font-semibold text-slate-900">"{searchQuery}"</span>
+                Showing results for:{" "}
+                <span className="font-semibold text-slate-900">
+                  "{searchQuery}"
+                </span>
               </p>
             </>
           ) : (
             <>
-              <p className="text-xs font-semibold uppercase tracking-[0.25em] text-yellow-700">Spring / Summer 2024</p>
-              <h1 className="text-4xl font-semibold text-slate-900">The Lagos Essence Collection</h1>
+              <p className="text-xs font-semibold uppercase tracking-[0.25em] text-yellow-700">
+                All Collections
+              </p>
+              <h1 className="text-4xl font-semibold text-slate-900">
+                Zoozu_ng Unisex Collections
+              </h1>
               <p className="text-base text-slate-600 max-w-2xl mx-auto">
-                Exploring the vibrancy of Nigerian heritage through modern cuts and premium fabrics.
+                Blending comfort with modern fashion, each item is made for
+                effortless everyday wear across all occasions.
               </p>
             </>
           )}
@@ -142,13 +187,33 @@ function CollectionsContent() {
 
         <div className="flex flex-wrap items-center justify-between gap-3 text-sm text-slate-600">
           <div className="flex gap-2">
-            <FilterDropdown label="Category" options={categoryOptions} selected={selectedCategory} onSelect={setSelectedCategory} />
-            <FilterDropdown label="Price" options={priceOptions} selected={selectedPrice} onSelect={setSelectedPrice} />
-            <FilterDropdown label="Availability" options={availabilityOptions} selected={selectedAvailability} onSelect={setSelectedAvailability} />
+            <FilterDropdown
+              label="Category"
+              options={categoryOptions}
+              selected={selectedCategory}
+              onSelect={setSelectedCategory}
+            />
+            <FilterDropdown
+              label="Price"
+              options={priceOptions}
+              selected={selectedPrice}
+              onSelect={setSelectedPrice}
+            />
+            <FilterDropdown
+              label="Availability"
+              options={availabilityOptions}
+              selected={selectedAvailability}
+              onSelect={setSelectedAvailability}
+            />
           </div>
           <div className="flex items-center gap-2">
             <span className="font-semibold text-slate-800">Sort by:</span>
-            <FilterDropdown label="New Arrivals" options={sortOptions} selected={selectedSort} onSelect={setSelectedSort} />
+            <FilterDropdown
+              label="New Arrivals"
+              options={sortOptions}
+              selected={selectedSort}
+              onSelect={setSelectedSort}
+            />
           </div>
         </div>
 
@@ -163,7 +228,9 @@ function CollectionsContent() {
         ) : products.length === 0 ? (
           <div className="text-center py-12">
             <p className="text-slate-600">
-              {searchQuery ? `No products found for "${searchQuery}".` : "No products found."}
+              {searchQuery
+                ? `No products found for "${searchQuery}".`
+                : "No products found."}
             </p>
             {searchQuery && (
               <Link
@@ -210,11 +277,20 @@ function CollectionsContent() {
                   </div>
                   <div className="p-4 space-y-2">
                     <div className="flex items-center justify-between">
-                      <p className="text-sm font-semibold text-yellow-700">{product.tag || (product.categories && product.categories[0])}</p>
-                      <p className="text-sm font-semibold text-slate-800">{formatCurrency(product.price)}</p>
+                      <p className="text-sm font-semibold text-yellow-700">
+                        {product.tag ||
+                          (product.categories && product.categories[0])}
+                      </p>
+                      <p className="text-sm font-semibold text-slate-800">
+                        {formatCurrency(product.price)}
+                      </p>
                     </div>
-                    <p className="text-lg font-semibold text-slate-900">{product.name}</p>
-                    <p className="text-sm text-slate-600 line-clamp-2">{product.description}</p>
+                    <p className="text-lg font-semibold text-slate-900">
+                      {product.name}
+                    </p>
+                    <p className="text-sm text-slate-600 line-clamp-2">
+                      {product.description}
+                    </p>
                   </div>
                 </Link>
               ))}
@@ -228,18 +304,19 @@ function CollectionsContent() {
 
 export default function CollectionsPage() {
   return (
-    <Suspense fallback={
-      <div className="bg-white pb-16 pt-12">
-        <div className="container">
-          <div className="text-center py-12">
-            <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-yellow-600 border-t-transparent"></div>
-            <p className="mt-4 text-sm text-slate-600">Loading...</p>
+    <Suspense
+      fallback={
+        <div className="bg-white pb-16 pt-12">
+          <div className="container">
+            <div className="text-center py-12">
+              <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-yellow-600 border-t-transparent"></div>
+              <p className="mt-4 text-sm text-slate-600">Loading...</p>
+            </div>
           </div>
         </div>
-      </div>
-    }>
+      }
+    >
       <CollectionsContent />
     </Suspense>
   );
 }
-

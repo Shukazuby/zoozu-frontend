@@ -8,16 +8,40 @@ import { type Product } from "@/lib/api";
 
 const formatCurrency = (value: number) => `₦${value.toLocaleString()}`;
 
-const categoryOptions = ["All", "Senator Sets", "Suits", "Agbada", "Kaftan", "Ready-to-Wear", "Accessories"];
-const priceOptions = ["All Prices", "Under ₦30,000", "₦30,000 - ₦60,000", "₦60,000 - ₦100,000", "Over ₦100,000"];
+const categoryOptions = [
+  "All",
+  "Senator Sets",
+  "Suits",
+  "Agbada",
+  "Kaftan",
+  "Ready-to-Wear",
+  "Accessories",
+];
+const priceOptions = [
+  "All Prices",
+  "Under ₦30,000",
+  "₦30,000 - ₦60,000",
+  "₦60,000 - ₦100,000",
+  "Over ₦100,000",
+];
 const availabilityOptions = ["All", "In Stock", "Pre-Order", "Bespoke Only"];
-const sortOptions = ["New Arrivals", "Price: Low to High", "Price: High to Low", "Most Popular", "Name: A-Z"];
+const sortOptions = [
+  "New Arrivals",
+  "Price: Low to High",
+  "Price: High to Low",
+  "Most Popular",
+  "Name: A-Z",
+];
 
 export default function MenCollectionsPage() {
   const { products, loading, error, getProducts } = useProducts();
-  const [selectedCategory, setSelectedCategory] = useState<string | undefined>();
+  const [selectedCategory, setSelectedCategory] = useState<
+    string | undefined
+  >();
   const [selectedPrice, setSelectedPrice] = useState<string | undefined>();
-  const [selectedAvailability, setSelectedAvailability] = useState<string | undefined>();
+  const [selectedAvailability, setSelectedAvailability] = useState<
+    string | undefined
+  >();
   const [selectedSort, setSelectedSort] = useState("New Arrivals");
 
   useEffect(() => {
@@ -74,26 +98,48 @@ export default function MenCollectionsPage() {
     }
 
     getProducts(filters);
-  }, [selectedCategory, selectedPrice, selectedAvailability, selectedSort, getProducts]);
+  }, [
+    selectedCategory,
+    selectedPrice,
+    selectedAvailability,
+    selectedSort,
+    getProducts,
+  ]);
 
   return (
     <div className="bg-white pb-16 pt-12">
       <div className="container space-y-10">
         <div className="text-center space-y-3">
-          <p className="text-xs font-semibold uppercase tracking-[0.25em] text-yellow-700">Men&apos;s Collection</p>
-          <h1 className="text-4xl font-semibold text-slate-900">Modern Nigerian Menswear</h1>
+          <p className="text-xs font-semibold uppercase tracking-[0.25em] text-yellow-700">
+            Men&apos;s Collection
+          </p>
+          <h1 className="text-4xl font-semibold text-slate-900">
+            Modern Nigerian Menswear
+          </h1>
           <p className="text-base text-slate-600 max-w-2xl mx-auto">
-            Elevated Senator sets, tailored suits, and contemporary agbadas crafted with premium fabrics and precision finishes.
+            Elevated Senator sets, tailored outfits, and contemporary agbadas
+            crafted with premium fabrics and precision finishes.
           </p>
         </div>
 
         <div className="flex flex-wrap items-center justify-center gap-3 text-sm font-semibold text-slate-700">
-          {["All", "Kaftan", "Jalabiya", "Agbada", "Ready-to-Wear", "Two-Piece"].map((item) => {
-            const isSelected = selectedCategory === item || (!selectedCategory && item === "All");
+          {[
+            "All",
+            "Kaftan",
+            "Jalabiya",
+            "Agbada",
+            "Ready-to-Wear",
+            "Two-Piece",
+          ].map((item) => {
+            const isSelected =
+              selectedCategory === item ||
+              (!selectedCategory && item === "All");
             return (
               <button
                 key={item}
-                onClick={() => setSelectedCategory(item === "All" ? undefined : item)}
+                onClick={() =>
+                  setSelectedCategory(item === "All" ? undefined : item)
+                }
                 className={`rounded-full border px-4 py-2 transition ${
                   isSelected
                     ? "border-yellow-600 text-yellow-700 bg-yellow-50"
@@ -108,13 +154,33 @@ export default function MenCollectionsPage() {
 
         <div className="flex flex-wrap items-center justify-between gap-3 text-sm text-slate-600">
           <div className="flex gap-2">
-            <FilterDropdown label="Category" options={categoryOptions} selected={selectedCategory} onSelect={setSelectedCategory} />
-            <FilterDropdown label="Price" options={priceOptions} selected={selectedPrice} onSelect={setSelectedPrice} />
-            <FilterDropdown label="Availability" options={availabilityOptions} selected={selectedAvailability} onSelect={setSelectedAvailability} />
+            <FilterDropdown
+              label="Category"
+              options={categoryOptions}
+              selected={selectedCategory}
+              onSelect={setSelectedCategory}
+            />
+            <FilterDropdown
+              label="Price"
+              options={priceOptions}
+              selected={selectedPrice}
+              onSelect={setSelectedPrice}
+            />
+            <FilterDropdown
+              label="Availability"
+              options={availabilityOptions}
+              selected={selectedAvailability}
+              onSelect={setSelectedAvailability}
+            />
           </div>
           <div className="flex items-center gap-2">
             <span className="font-semibold text-slate-800">Sort by:</span>
-            <FilterDropdown label="New Arrivals" options={sortOptions} selected={selectedSort} onSelect={setSelectedSort} />
+            <FilterDropdown
+              label="New Arrivals"
+              options={sortOptions}
+              selected={selectedSort}
+              onSelect={setSelectedSort}
+            />
           </div>
         </div>
 
@@ -165,11 +231,20 @@ export default function MenCollectionsPage() {
                 </div>
                 <div className="p-4 space-y-2">
                   <div className="flex items-center justify-between">
-                    <p className="text-sm font-semibold text-yellow-700">{product.tag || (product.categories && product.categories[0])}</p>
-                    <p className="text-sm font-semibold text-slate-800">{formatCurrency(product.price)}</p>
+                    <p className="text-sm font-semibold text-yellow-700">
+                      {product.tag ||
+                        (product.categories && product.categories[0])}
+                    </p>
+                    <p className="text-sm font-semibold text-slate-800">
+                      {formatCurrency(product.price)}
+                    </p>
                   </div>
-                  <p className="text-lg font-semibold text-slate-900">{product.name}</p>
-                  <p className="text-sm text-slate-600 line-clamp-2">{product.description}</p>
+                  <p className="text-lg font-semibold text-slate-900">
+                    {product.name}
+                  </p>
+                  <p className="text-sm text-slate-600 line-clamp-2">
+                    {product.description}
+                  </p>
                 </div>
               </Link>
             ))}
@@ -179,4 +254,3 @@ export default function MenCollectionsPage() {
     </div>
   );
 }
-

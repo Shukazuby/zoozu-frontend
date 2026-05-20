@@ -3,6 +3,8 @@
 import { useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import GalleryCard from "./GalleryCard";
+import { gallerySlides } from "@/lib/gallery";
 import { useProducts } from "@/lib/hooks";
 import { type Product } from "@/lib/api";
 
@@ -116,6 +118,66 @@ function HeroTapeRoll() {
 }
 
 const formatCurrency = (value: number) => `₦${value.toLocaleString()}`;
+
+function GalleryTapeRoll() {
+  const viewportRef = useRef<HTMLDivElement>(null);
+  const trackRef = useRef<HTMLDivElement>(null);
+  const offsetRef = useRef(0);
+  const pausedRef = useRef(false);
+  useEffect(() => {
+    const track = trackRef.current;
+    const viewport = viewportRef.current;
+    if (!track || !viewport) return;
+
+    const onEnter = () => (pausedRef.current = true);
+    const onLeave = () => (pausedRef.current = false);
+
+    viewport.addEventListener("mouseenter", onEnter);
+    viewport.addEventListener("mouseleave", onLeave);
+
+    let raf = 0;
+
+    const tick = () => {
+      if (!pausedRef.current) {
+        const loopWidth = track.scrollWidth / 2 || 0;
+        if (loopWidth > 0) {
+          offsetRef.current += TAPE_SCROLL_SPEED * 0.9;
+          if (offsetRef.current >= loopWidth) offsetRef.current -= loopWidth;
+          track.style.transform = `translate3d(-${offsetRef.current}px, 0, 0)`;
+        }
+      }
+      raf = requestAnimationFrame(tick);
+    };
+
+    raf = requestAnimationFrame(tick);
+    return () => {
+      cancelAnimationFrame(raf);
+      viewport.removeEventListener("mouseenter", onEnter);
+      viewport.removeEventListener("mouseleave", onLeave);
+    };
+  }, []);
+
+  return (
+    <div className="overflow-hidden">
+      <div ref={viewportRef} className="h-80 w-full overflow-hidden">
+        <div
+          ref={trackRef}
+          className="flex h-full items-center gap-4 py-3"
+          style={{ width: "max-content", willChange: "transform" }}
+        >
+          {[...gallerySlides, ...gallerySlides].map((slide, i) => (
+            <div
+              key={`${slide.src}-${i}`}
+              className="shrink-0 w-[220px] md:w-[260px]"
+            >
+              <GalleryCard src={slide.src} alt={slide.alt} />
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 const testimonials = [
   {
@@ -311,7 +373,7 @@ export default function HomeClient() {
           </div>
 
           <div className="relative flex items-center justify-center">
-            <div className="relative h-[320px] w-full max-w-xl overflow-hidden rounded-lg shadow-lg">
+            <div className="relative h-[480px] w-full max-w-2xl overflow-hidden rounded-lg shadow-lg">
               <Image
                 src="https://res.cloudinary.com/dkqtwvhq2/image/upload/v1779230069/IMG_6149_2_cdv6dt.jpg"
                 alt="Zoozu_ng"
@@ -319,7 +381,7 @@ export default function HomeClient() {
                 className="object-cover"
               />
             </div>
-            <div className="absolute left-4 -bottom-6 block h-[140px] w-[160px] overflow-hidden rounded-lg shadow-md md:-left-10 md:-bottom-12 md:h-[220px] md:w-[240px]">
+            <div className="absolute left-6 -bottom-8 block h-[200px] w-[180px] overflow-hidden rounded-lg shadow-md md:-left-12 md:-bottom-14 md:h-[300px] md:w-[260px]">
               <Image
                 src="https://res.cloudinary.com/dkqtwvhq2/image/upload/v1779229795/IMG_6148_lkiivc.jpg"
                 alt="Zoozu_ng"
@@ -349,6 +411,45 @@ export default function HomeClient() {
               Marzooqa Shuka | Creative Director, Zoozu_ng
             </span>
           </div>
+        </div>
+      </section>
+
+      <section className="section relative" id="gallery">
+        <div className="container space-y-6">
+          <div className="text-center">
+            <p className="text-xs uppercase tracking-[0.25em] text-slate-500">
+              Gallery
+            </p>
+            <h3 className="text-2xl font-semibold text-slate-900">
+              Snapshots from Zoozu
+            </h3>
+            <p className="max-w-2xl mx-auto text-sm text-slate-600">
+              A curated roll of looks and moments — real people, real style.
+            </p>
+          </div>
+
+          <GalleryTapeRoll />
+
+          <Link
+            href="/gallery"
+            aria-label="View full gallery"
+            className="absolute right-6 top-1/2 z-20 -translate-y-1/2 rounded-full bg-white/95 p-2 shadow-md border border-slate-200 hover:bg-white"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={2}
+              stroke="currentColor"
+              className="h-5 w-5 text-slate-900"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M9 5l7 7-7 7"
+              />
+            </svg>
+          </Link>
         </div>
       </section>
 

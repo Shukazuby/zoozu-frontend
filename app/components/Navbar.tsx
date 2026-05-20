@@ -6,6 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { tokenManager } from "@/lib/api";
 
 const navLinks = [
+  { href: "/collections", label: "Shop" },
   { href: "/collections/men", label: "Shop Men" },
   { href: "/collections/women", label: "Shop Women" },
   { href: "/about", label: "About" },
@@ -21,7 +22,7 @@ type IconButtonProps = {
 
 const IconButton = ({ label, href, onClick, children }: IconButtonProps) => {
   const classes =
-    "grid h-9 w-9 place-items-center rounded-full border border-slate-200/70 bg-white/85 text-slate-800 transition hover:border-slate-300 hover:bg-white";
+    "grid h-9 w-9 place-items-center rounded-full border border-slate-200/70 bg-white/85 text-slate-800 shadow-sm transition hover:border-slate-300 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-500/20";
 
   if (href) {
     return (
@@ -179,7 +180,7 @@ export default function Navbar() {
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
-                    d="m21 21-4.35-4.35m0 0A7.5 7.5 0 1 0 6.75 6.75a7.5 7.5 0 0 0 9.9 9.9Z"
+                    d="M21 21l-5.2-5.2m2.3-4.5A7.3 7.3 0 1110.5 3.7a7.3 7.3 0 017.6 7.6Z"
                   />
                 </svg>
               </IconButton>
